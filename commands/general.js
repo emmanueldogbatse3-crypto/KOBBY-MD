@@ -1,3 +1,4 @@
+
 import { buildMenu } from "../lib/menu.js";
 
 function formatDuration(seconds) {
@@ -25,6 +26,181 @@ function messageTimestampMs(message) {
 
 function ownerNumber(config) {
   const owners = Array.isArray(config.ownerNumbers) ? config.ownerNumbers : [];
+  return String(owners[0] || "").replace(/\D/g, "");
+}
+
+const commands = [
+  {
+    name: "menu",
+    aliases: ["helpme"],
+    category: "General",
+    description: "Show the branded KOBBY MD menu and available command sections.",
+    run: async ctx => {
+      const menu = buildMenu({ commands: ctx.commands, config: ctx.config, theme: ctx.theme });
+      if (ctx.config.imageUrl) {
+        try {
+          await ctx.send({
+            image: { url: ctx.config.imageUrl },
+            caption: "🤖 *𝙆𝙊𝘽𝘽𝙔 𝙈𝘿 — WhatsApp Bot*\n" +
+              "Official pairing portal: " + ctx.config.botUrl + "\n" +
+              "⚡ 𝙋𝙊𝙒𝙀𝙍𝙀𝘿 𝘽𝙔 𝙆𝙊𝘽𝘽𝙔 𝙈𝘿"
+          });
+        } catch (error) {
+          console.warn("KOBBY MD menu artwork could not be sent; using the text menu:", error?.message || error);
+        }
+      }
+      await ctx.reply(menu);
+    }
+  },
+  {
+    name: "help",
+    category: "General",
+    description: "List registered commands and their descriptions.",
+    run: async ctx => {
+      const rows = (ctx.commands || [])
+        .filter(command => !command.hidden)
+        .slice()
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(command => ctx.config.prefix + command.name + (command.description ? " — " + command.description : ""));
+      const header = "📚 𝙆𝙊𝘽𝘽𝙔 𝙈𝘿 𝙃𝙀𝙇𝙋\n" + rows.length + " registered commands\n\n";
+      const chunks = [];
+      let current = header;
+      for (const row of rows) {
+        if (current.length + row.length + 1 > 3300) {
+          chunks.push(current.trimEnd());
+          current = "📚 𝙆𝙊𝘽𝘽𝙔 𝙈𝘿 𝙃𝙀𝙇𝙋 (continued)\n\n";
+        }
+        current += row + "\n";
+      }
+      if (current.trim()) chunks.push(current.trimEnd());
+      for (const chunk of chunks) await ctx.reply(chunk);
+    }
+  },
+  {
+    name: "ping",
+    category: "General",
+    description: "Check bot responsiveness and estimated message response time.",
+    run: async ctx => {
+      const timestamp = messageTimestampMs(ctx.msg);
+      const responseMs = timestamp === null ? null : Math.max(0, Date.now() - timestamp);
+      await ctx.reply([
+        "┏━━〔 🏓 𝙆𝙊𝘽𝘽𝙔 𝙈𝘿 · 𝙋𝙊𝙉𝙂 〕━━✦",
+        "┃ ❖ Status: " + (ctx.connectionOpen ? "Online 🟢" : "Connecting 🟡"),
+        "┃ ❖ Response: " + (responseMs === null ? "Unavailable" : responseMs + " ms"),
+        "┃ ❖ Uptime: " + formatDuration(process.uptime()),
+        "┃ ❖ Version: " + ctx.config.version,
+        "┗━━━━━━━━━━━━━━━━━━━━━━✦"
+      ].join("\n"));
+    }
+  },
+  {
+    name: "alive",
+    aliases: ["uptime"],
+    category: "General",
+    description: "Show bot status, mode and uptime.",
+    run: async ctx => {
+      await ctx.reply(
+        "✅ " + ctx.config.name + " is " + (ctx.connectionOpen ? "online." : "connecting.") +
+        "\n🔐 Mode: " + String(ctx.mode || "public").toUpperCase() +
+        "\n⏱️ Uptime: " + formatDuration(process.uptime()) +
+        "\n⚡ 𝙋𝙊𝙒𝙀𝙍𝙀𝘿 𝘽𝙔 𝙆𝙊𝘽𝘽𝙔 𝙈𝘿"
+      );
+    }
+  },
+  {
+    name: "owner",
+    category: "General",
+    description: "Show KOBBY MD owner details.",
+    run: async ctx => {
+      const number = ownerNumber(ctx.config);
+      await ctx.reply(
+        "👑 𝙊𝙒𝙉𝙀𝙍: " + ctx.config.ownerName +
+        (number ? "\n📱 Owner number: +" + number : "")
+      );
+    }
+  },
+  {
+    name: "support",
+    category: "General",
+    description: "Show support guidance for KOBBY MD.",
+    run: async ctx => {
+      await ctx.reply(
+        "🛟 𝙆𝙊𝘽𝘽𝙔 𝙈𝘿 𝙎𝙐𝙋𝙋𝙊𝙍𝙏\nFor setup help or bug reports, contact " +
+        ctx.config.ownerName + ".\n\nGitHub: https://github.com/Benfeitech/FEI-XMD"
+      );
+    }
+  },
+  {
+    name: "time",
+    category: "General",
+    description: "Show the current server time in Nigeria.",
+    run: async ctx => {
+      const value = new Intl.DateTimeFormat("en-NG", {
+        timeZone: "Africa/Lagos",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true
+      }).format(new Date());
+      await ctx.reply("🕒 𝙉𝙄𝙂𝙀𝙍𝙄𝘼 𝙏𝙄𝙈𝙀: " + value);
+    }
+  },
+  {
+    name: "date",
+    category: "General",
+    description: "Show the current date in Nigeria.",
+    run: async ctx => {
+      const value = new Intl.DateTimeFormat("en-NG", {
+        timeZone: "Africa/Lagos",
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+      }).format(new Date());
+      await ctx.reply("📅 𝘿𝘼𝙏𝙀 𝙄𝙉 𝙉𝙄𝙂𝙀𝙍𝙄𝘼: " + value);
+    }
+  },
+  {
+    name: "version",
+    category: "General",
+    description: "Show KOBBY MD version and connection status.",
+    run: async ctx => {
+      await ctx.reply(
+        "🤖 " + ctx.config.name + " v" + ctx.config.version +
+        "\n🟢 Status: " + (ctx.connectionOpen ? "Online" : "Connecting") +
+        "\n🔐 Mode: " + String(ctx.mode || "public").toUpperCase() +
+        "\n📦 Baileys: official WhiskeySockets npm package"
+      );
+    }
+  },
+  {
+    name: "jid",
+    aliases: ["id"],
+    category: "General",
+    description: "Show the current chat and message sender IDs.",
+    run: async ctx => {
+      await ctx.reply(
+        "💬 𝘾𝙃𝘼𝙏 𝙄𝘿: " + ctx.jid +
+        "\n👤 𝙎𝙀𝙉𝘿𝙀𝙍 𝙄𝘿: " + (ctx.senderJid || "Unavailable")
+      );
+    }
+  },
+  {
+    name: "whoami",
+    category: "General",
+    description: "Show your WhatsApp sender information.",
+    run: async ctx => {
+      await ctx.reply(
+        "👤 𝙉𝘼𝙈𝙀: " + (ctx.msg?.pushName || "Unknown") +
+        "\n🆔 𝙔𝙊𝙐𝙍 𝙄𝘿: " + (ctx.senderJid || "Unavailable") +
+        "\n👑 𝙊𝙒𝙉𝙀𝙍: " + (ctx.owner ? "Yes" : "No")
+      );
+    }
+  }
+];
+
+export default commands;
+
   return String(owners[0] || "").replace(/\D/g, "");
 }
 
