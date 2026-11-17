@@ -1,30 +1,35 @@
+
 export default Object.freeze({
-  botTitle: "🤖 ꜰᴇɪ xᴍᴅ ʙᴏᴛ",
+  botTitle: "⚡ 𝙁𝙀𝙄 𝙓𝙈𝘿 𝘽𝙊𝙏",
   menu: {
-    top: "╭━━〔 ",
-    titleEnd: " 〕━━┈⊷",
-    infoLine: "┃ ✫ ",
-    itemLine: "┃ ✫✧│ ",
+    top: "┏━━〔 ",
+    titleEnd: " 〕━━✦",
+    infoLine: "┃ ❖ ",
+    itemLine: "┃ ➤✧│ ",
     blankLine: "┃",
-    bottom: "╰━━━━━━━━━━━━┈⊷"
+    bottom: "┗━━━━━━━━━━━━✦"
   },
   sections: [
-    { key: "General", title: "🏠 ɢᴇɴᴇʀᴀʟ", categories: ["General"] },
-    { key: "AI & Chat", title: "🧠 ᴀɪ ᴄʜᴀᴛ", categories: ["AI & Chat"] },
-    { key: "AI Media", title: "🎨 ᴀɪ ᴍᴇᴅɪᴀ", categories: ["AI Media"] },
-    { key: "News Desk", title: "📰 ɴᴇᴡs ᴅᴇsᴋ", categories: ["News"] },
-    { key: "Group Tools", title: "👥 ɢʀᴏᴜᴘ ᴛᴏᴏʟs", categories: ["Group"] },
-    { key: "Downloads", title: "📥 ᴅᴏᴡɴʟᴏᴀᴅs", categories: ["Downloads"] },
+    { key: "General", title: "🌍 𝙂𝙀𝙉𝙀𝙍𝘼𝙇", categories: ["General"] },
+    { key: "AI & Chat", title: "🤖 𝘼𝙄 𝘾𝙃𝘼𝙏", categories: ["AI & Chat"] },
+    { key: "AI Media", title: "🎭 𝘼𝙄 𝙈𝙀𝘿𝙄𝘼", categories: ["AI Media"] },
+    { key: "News Desk", title: "📡 𝙉𝙀𝙒𝙎 𝘿𝙀𝙎𝙆", categories: ["News"] },
+    { key: "Group Tools", title: "👤 𝙂𝙍𝙊𝙐𝙋 𝙏𝙊𝙊𝙇𝙎", categories: ["Group"] },
+    { key: "Downloads", title: "⬇️ 𝘿𝙊𝙒𝙉𝙇𝙊𝘼𝘿𝙎", categories: ["Downloads"] },
     {
       key: "Fun Games",
-      title: "🎮 ғᴜɴ ɢᴀᴍᴇs",
+      title: "🎯 𝙁𝙐𝙉 𝙂𝘼𝙈𝙀𝙎",
       commandNames: ["calc", "poll", "coinflip", "dice", "8ball", "choose", "trivia", "riddle", "activity", "pokemon"]
     },
     {
       key: "Fun Mix",
-      title: "🎉 ғᴜɴ ᴍɪx",
+      title: "🎊 𝙁𝙐𝙉 𝙈𝙄𝙓",
       categories: ["Fun"],
       excludeNames: ["pokemon"]
+    }
+  ]
+});
+
     },
     {
       key: "Anime Info",
